@@ -24,4 +24,4 @@ This PR sets up the Analytics Engineering bootcamp I will teach with my company 
    git fetch origin feature-branch-name
    git checkout feature-branch-name
 
-## Screenshot of the dbt lineage
+## 🔗 Screenshot of the dbt lineage
