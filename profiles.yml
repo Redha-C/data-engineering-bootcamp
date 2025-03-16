@@ -1,16 +1,10 @@
-<profile-name>:
-  target: <target-name> # this is the default target
+ae_bootcamp_standupfree:
+  target: dev # this is the default target
   outputs:
-    <target-name>:
-      type: <bigquery | postgres | redshift | snowflake | other>
-      schema: <schema_identifier>
-      threads: <natural_number>
-
-      ### database-specific connection details
-      ...
-
-    <target-name>: # additional targets
-      ...
-
-<profile-name>: # additional profiles
-  ...
+    dev:
+      type: bigquery
+      method: service-account
+      project: ae-bootcamp-standupfree
+      dataset: jaffle_shop
+      thread: 4
+      keyfile: ae-bootcamp-standupfree-b6b98e0d9a22.json
