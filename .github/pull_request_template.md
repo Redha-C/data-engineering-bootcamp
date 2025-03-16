@@ -1,6 +1,6 @@
 ## 🚀 Summary
 <!-- Briefly describe the changes made in this PR. -->
-This PR sets up the Analytics Engineering bootcamp I will teach with my company **Stand'Up Free**.
+This PR introduces [brief description of the changes, e.g., "a new dbt model for customer segmentation"]. 
 
 ## 📌 Changes Included
 <!-- List the key modifications in this PR -->
