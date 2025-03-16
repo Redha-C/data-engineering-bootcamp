@@ -1,0 +1,16 @@
+<profile-name>:
+  target: <target-name> # this is the default target
+  outputs:
+    <target-name>:
+      type: <bigquery | postgres | redshift | snowflake | other>
+      schema: <schema_identifier>
+      threads: <natural_number>
+
+      ### database-specific connection details
+      ...
+
+    <target-name>: # additional targets
+      ...
+
+<profile-name>: # additional profiles
+  ...
