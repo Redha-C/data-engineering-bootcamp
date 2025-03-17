@@ -173,7 +173,7 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-# Dbt
+# dbt
 /logs
 ae-bootcamp-standupfree-b6b98e0d9a22.json
 dbt_packages/
