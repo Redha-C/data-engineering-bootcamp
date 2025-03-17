@@ -1,0 +1,9 @@
+models:
+  - name: dim_locations
+    description: |
+      Location dimension table. The grain of the table is one row per location.
+    columns:
+      - name: location_id
+      - name: location_name
+      - name: tax_rate
+      - name: opened_date

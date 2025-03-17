@@ -173,12 +173,12 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-# Dbt
+# dbt
 /logs
 ae-bootcamp-standupfree-b6b98e0d9a22.json
 dbt_packages/
 package-lock.yml
-seeds/*.csv
+*.csv
 
 #user cookies (https://github.com/dbt-labs/dbt-core/issues/1645)
 .user.yml
