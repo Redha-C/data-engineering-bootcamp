@@ -34,7 +34,7 @@ customer_orders_summary as (
 joined as (
 
     select
-        customers.*,
+        customers.*, 
 
         customer_orders_summary.count_lifetime_orders,
         customer_orders_summary.first_ordered_at,
