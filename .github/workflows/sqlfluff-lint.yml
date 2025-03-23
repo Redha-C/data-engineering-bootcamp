@@ -30,6 +30,14 @@ jobs:
         run: |
           pip install -r requirements.txt
 
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Save GCP service account key
+        run: echo "${{ secrets.GCP_SA_KEY }}"
+
       - name: Changed Files
         id: changed-files
         uses: tj-actions/changed-files@v42.0.2
@@ -47,11 +55,6 @@ jobs:
       - name: Install dbt packages
         run: |
           dbt deps
-
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
       - name: Fix dbt models
         continue-on-error: true
