@@ -22,7 +22,7 @@ customer_orders_summary as (
         min(orders.ordered_at) as first_ordered_at,
         max(orders.ordered_at) as last_ordered_at,
         sum(orders.subtotal) as lifetime_spend_pretax,
-        sum(orders.tax_paid) as lifetime_tax_paid,
+        sum(orders.tax_paid) as lifetime_tax_paid
         sum(orders.order_total) as lifetime_spend
 
     from orders
