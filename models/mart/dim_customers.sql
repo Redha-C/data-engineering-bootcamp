@@ -32,7 +32,7 @@ customer_orders_summary as (
 ),
 
 test as (
-    SELECT 1
+    select 1
 ),
 
 joined as (

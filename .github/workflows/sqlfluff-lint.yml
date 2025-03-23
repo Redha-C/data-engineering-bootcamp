@@ -12,7 +12,7 @@ env:
   DBT_TARGET: ci
 
 jobs:
-  fix-and-comment:
+  sqlfluff-fix:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
