@@ -60,59 +60,6 @@ jobs:
         run: |
           
           sqlfluff fix ${{ steps.changed-files.outputs.all_changed_files }} --exclude-rules LT12,LT01,L034,AM06,RF02,LT04,LT05
-          
-
-      - name: Check for Changes and Prepare Comment
-        if: success() && steps.changed-files.outputs.all_changed_files != ''
-        id: prepare_comment
-        run: |
-          
-          changes_made=false
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}
-          do
-            if ! cmp -s "$file.bak" "$file"; then
-              changes_made=true
-              break
-            fi
-          done
-
-          if [ "$changes_made" = false ]; then
-            echo "NO_CHANGES=true" >> $GITHUB_ENV
-          else
-            formatted_diff=""
-
-            for file in ${{ steps.changed-files.outputs.all_changed_files }}
-            do
-            if [ -s "$file" ]; then  # Check if file is not empty
-                formatted_diff+=$'\n\n<details><summary>'"$file"$'</summary>\n\n```sql\n'"$(cat "$file")"$'\n```\n</details>'
-            else
-                formatted_diff+=$'\n\n'"$file is empty or not readable."
-            fi
-            done
-
-            echo "formatted_comment<<EOF" >> $GITHUB_ENV
-            echo -e "$formatted_diff" >> $GITHUB_ENV
-            echo "EOF" >> $GITHUB_ENV
-            echo "NO_CHANGES=false" >> $GITHUB_ENV
-          fi
-
-      - name: Comment - No Changes
-        if: env.NO_CHANGES == 'true'
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          issue-number: "${{ github.event.pull_request.number }}"
-          body: ✅ All sql files linted properly
-
-      - name: Create or Update Comment
-        if: env.NO_CHANGES == 'false'
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          comment-id: ${{ steps.prepare_comment.outputs.comment-id }}
-          issue-number: "${{ github.event.pull_request.number }}"
-          body: |
-              ❌ Implement lint for these SQL files and commit again.
-              ${{ env.formatted_comment }}
-          token: "${{ secrets.ae-token-standup-free }}"
 
       - name: Set Merge Block Flag
         if: env.NO_CHANGES == 'false'
