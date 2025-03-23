@@ -1,114 +1,19 @@
-name: SQLFluff lint dbt data models
+name: Test Project
 
 on:
   pull_request:
     branches:
       - main
-    paths:
-      - 'models/**/*.sql'
 
 jobs:
-  fix-and-comment:
+  test:
     runs-on: ubuntu-latest
+    container:
+      image: node:20
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
         with:
-          fetch-depth: 2
-
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Changed Files
-        id: changed-files
-        uses: tj-actions/changed-files@v42.0.2
-        with:
-          files: models/**/*.sql
-
-      - name: Backup Original Files
-        run: |
-          
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}
-          do
-            cp "$file" "$file.bak"
-          done
-          
-      - name: Install dbt packages
-        run: |
-          dbt deps
-
-      - name: Fix dbt models
-        continue-on-error: true
-        if: steps.changed-files.outputs.all_changed_files != ''
-        run: |
-          
-          sqlfluff fix ${{ steps.changed-files.outputs.all_changed_files }} --exclude-rules LT12,LT01,L034,AM06,RF02,LT04,LT05
-          
-
-      - name: Check for Changes and Prepare Comment
-        if: success() && steps.changed-files.outputs.all_changed_files != ''
-        id: prepare_comment
-        run: |
-          
-          changes_made=false
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}
-          do
-            if ! cmp -s "$file.bak" "$file"; then
-              changes_made=true
-              break
-            fi
-          done
-
-          if [ "$changes_made" = false ]; then
-            echo "NO_CHANGES=true" >> $GITHUB_ENV
-          else
-            formatted_diff=""
-
-            for file in ${{ steps.changed-files.outputs.all_changed_files }}
-            do
-            if [ -s "$file" ]; then  # Check if file is not empty
-                formatted_diff+=$'\n\n<details><summary>'"$file"$'</summary>\n\n```sql\n'"$(cat "$file")"$'\n```\n</details>'
-            else
-                formatted_diff+=$'\n\n'"$file is empty or not readable."
-            fi
-            done
-
-            echo "formatted_comment<<EOF" >> $GITHUB_ENV
-            echo -e "$formatted_diff" >> $GITHUB_ENV
-            echo "EOF" >> $GITHUB_ENV
-            echo "NO_CHANGES=false" >> $GITHUB_ENV
-          fi
-          
-
-      - name: Comment - No Changes
-        if: env.NO_CHANGES == 'true'
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          issue-number: "${{ github.event.pull_request.number }}"
-          body: ✅ All sql files linted properly
-
-      - name: Create or Update Comment
-        if: env.NO_CHANGES == 'false'
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          issue-number: "${{ github.event.pull_request.number }}"
-          body: |
-              ❌ Implement lint for these SQL files and commit again.
-              ${{ env.formatted_comment }}
-          token: "${{ secrets.GITHUB_TOKEN }}"
-
-      - name: Set Merge Block Flag
-        if: env.NO_CHANGES == 'false'
-        run: echo "MERGE_BLOCKED=true" >> "$GITHUB_ENV"
-
-      - name: Prevent Merge
-        if: env.MERGE_BLOCKED == 'true'
-        run: |
-          echo "Merging is blocked due to the completion of comment step."
-          exit 1
+          node-version: 20
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
