@@ -7,6 +7,9 @@ on:
     paths:
       - 'models/**/*.sql'
 
+permissions:
+  pull-requests: write
+
 env:
   DBT_PROFILES_DIR: ./
   DBT_TARGET: ci
@@ -95,7 +98,6 @@ jobs:
             echo "EOF" >> $GITHUB_ENV
             echo "NO_CHANGES=false" >> $GITHUB_ENV
           fi
-          
 
       - name: Comment - No Changes
         if: env.NO_CHANGES == 'true'
