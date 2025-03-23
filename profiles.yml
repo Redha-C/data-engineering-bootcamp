@@ -8,29 +8,29 @@ ae_bootcamp_standupfree:
       method: service-account
       project: ae-bootcamp-standupfree
       dataset: dev_jaffle_shop
-      thread: 4
-      keyfile: ae-bootcamp-standupfree-b6b98e0d9a22.json
+      threads: 4
+      keyfile: "{{ env_var('GCP_SA_KEY') }}"
 
     dev:
       type: bigquery
       method: service-account
       project: ae-bootcamp-standupfree
       dataset: dev_jaffle_shop
-      thread: 4
-      keyfile: ae-bootcamp-standupfree-b6b98e0d9a22.json
+      threads: 4
+      keyfile: "{{ env_var('GCP_SA_KEY') }}"
 
     preprod:
       type: bigquery
       method: service-account
       project: ae-bootcamp-standupfree
       dataset: preprod_jaffle_shop
-      thread: 4
-      keyfile: ae-bootcamp-standupfree-b6b98e0d9a22.json
+      threads: 4
+      keyfile: "{{ env_var('GCP_SA_KEY') }}"
 
     prod:
       type: bigquery
       method: service-account
       project: ae-bootcamp-standupfree
       dataset: prod_jaffle_shop
-      thread: 4
-      keyfile: ae-bootcamp-standupfree-b6b98e0d9a22.json
+      threads: 4
+      keyfile: "{{ env_var('GCP_SA_KEY') }}"
