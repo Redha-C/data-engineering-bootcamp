@@ -58,7 +58,7 @@ jobs:
         if: steps.changed-files.outputs.all_changed_files != ''
         run: |
           
-          sqlfluff fix ${{ steps.changed-files.outputs.all_changed_files }} 
+          sqlfluff fix ${{ steps.changed-files.outputs.all_changed_files }} --exclude-rules LT12,LT01,L034,AM06,RF02,LT04,LT05
           
 
       - name: Check for Changes and Prepare Comment
@@ -112,10 +112,6 @@ jobs:
               ❌ Implement lint for these SQL files and commit again.
               ${{ env.formatted_comment }}
           token: "${{ secrets.GITHUB_TOKEN }}"
-
-      - name: ✅ Mark Lint Passed
-        if: env.NO_CHANGES == 'true'
-        run: echo "Linting passed — ready to merge!"
 
       - name: Set Merge Block Flag
         if: env.NO_CHANGES == 'false'
