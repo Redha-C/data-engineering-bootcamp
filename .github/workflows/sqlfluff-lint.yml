@@ -7,9 +7,6 @@ on:
     paths:
       - 'models/**/*.sql'
 
-permissions:
-  pull-requests: write
-
 env:
   DBT_PROFILES_DIR: ./
   DBT_TARGET: ci
@@ -108,13 +105,14 @@ jobs:
 
       - name: Create or Update Comment
         if: env.NO_CHANGES == 'false'
-        uses: peter-evans/create-or-update-comment@v1
+        uses: peter-evans/create-or-update-comment@v4
         with:
+          comment-id: ${{ steps.prepare_comment.outputs.comment-id }}
           issue-number: "${{ github.event.pull_request.number }}"
           body: |
               ❌ Implement lint for these SQL files and commit again.
               ${{ env.formatted_comment }}
-          token: "${{ secrets.GITHUB_TOKEN }}"
+          token: "${{ secrets.ae-token-standup-free }}"
 
       - name: Set Merge Block Flag
         if: env.NO_CHANGES == 'false'
