@@ -1,10 +1,32 @@
 ae_bootcamp_standupfree:
-  target: dev # this is the default target
+
+  target: "{{ env_var('DBT_TARGET') }}" # this is the default target
+
   outputs:
+    ci:
+      type: bigquery
+      method: oauth
+      project: ae-bootcamp-standupfree
+      dataset: dev_jaffle_shop
+      threads: 4
+ 
     dev:
       type: bigquery
-      method: service-account
+      method: oauth
       project: ae-bootcamp-standupfree
-      dataset: jaffle_shop
-      thread: 4
-      keyfile: ae-bootcamp-standupfree-b6b98e0d9a22.json
+      dataset: dev_jaffle_shop
+      threads: 4
+
+    preprod:
+      type: bigquery
+      method: oauth
+      project: ae-bootcamp-standupfree
+      dataset: preprod_jaffle_shop
+      threads: 4
+
+    prod:
+      type: bigquery
+      method: oauth
+      project: ae-bootcamp-standupfree
+      dataset: prod_jaffle_shop
+      threads: 4
