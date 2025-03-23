@@ -48,7 +48,7 @@ jobs:
         if: steps.changed-files.outputs.all_changed_files != ''
         run: |
           
-          sqlfluff fix ${{ steps.changed-files.outputs.all_changed_files }} --exclude-rules LT12,LT01,L034,AM06,RF02,LT04,LT05
+          sqlfluff fix ${{ steps.changed-files.outputs.all_changed_files }} 
           
 
       - name: Check for Changes and Prepare Comment
