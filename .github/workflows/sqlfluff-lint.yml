@@ -13,7 +13,7 @@ env:
   DBT_PR_ID: "${{github.event.number}}"
 
 jobs:
-  sqlfluff-fix:
+  sqlfluff-lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -54,7 +54,7 @@ jobs:
         run: |
           dbt deps
 
-      - name: Fix dbt models
+      - name: Lint dbt models
         continue-on-error: false
         if: steps.changed-files.outputs.all_changed_files != ''
         run: |
