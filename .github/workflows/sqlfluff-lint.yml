@@ -10,6 +10,7 @@ on:
 env:
   DBT_PROFILES_DIR: ./
   DBT_TARGET: ci
+  DBT_SA_KEY: ${{ secrets.GCP_SA_KEY }}
 
 jobs:
   fix-and-comment:
