@@ -12,7 +12,7 @@ orders as (
 
 ),
 
-customer_orders_summary as ( 
+customer_orders_summary as (
 
     select
         orders.customer_id,
