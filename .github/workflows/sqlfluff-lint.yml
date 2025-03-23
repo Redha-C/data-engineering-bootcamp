@@ -98,14 +98,14 @@ jobs:
 
       - name: Comment - No Changes
         if: env.NO_CHANGES == 'true'
-        uses: peter-evans/create-or-update-comment@v1
+        uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: "${{ github.event.pull_request.number }}"
           body: ✅ All sql files linted properly
 
       - name: Create or Update Comment
         if: env.NO_CHANGES == 'false'
-        uses: peter-evans/create-or-update-comment@v1
+        uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: "${{ github.event.pull_request.number }}"
           body: |
