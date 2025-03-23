@@ -8,56 +8,112 @@ on:
       - 'models/**/*.sql'
 
 env:
-  DBT_TARGET: ci
   DBT_PROFILES_DIR: ./
+  DBT_TARGET: ci
+  GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
 
 jobs:
-  lint-dbt-models:
+  fix-and-comment:
     runs-on: ubuntu-latest
-
     steps:
-      - name: 📥 Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
-      - name: 🐍 Set up Python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
 
-      - name: 🔐 Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: '${{ secrets.GCP_SA_KEY }}'
-          export_environment_variables: true
-
-      - name: 📦 Install Python dependencies
+      - name: Install dependencies
         run: |
           pip install -r requirements.txt
 
-      - name: 🔍 Detect Changed SQL Files
+      - name: Changed Files
         id: changed-files
         uses: tj-actions/changed-files@v42.0.2
         with:
           files: models/**/*.sql
 
-      - name: 📂 Backup Original Files
+      - name: Backup Original Files
         run: |
+          
           for file in ${{ steps.changed-files.outputs.all_changed_files }}
           do
             cp "$file" "$file.bak"
           done
+          
+      - name: Install dbt packages
+        run: |
+          dbt deps
 
-      - name: 📦 Install dbt Packages
-        run: dbt deps
-
-      - name: ✨ Run SQLFluff Fix
+      - name: Fix dbt models
         continue-on-error: true
         if: steps.changed-files.outputs.all_changed_files != ''
         run: |
-          sqlfluff fix ${{ steps.changed-files.outputs.all_changed_files }}
+          
+          sqlfluff fix ${{ steps.changed-files.outputs.all_changed_files }} 
+          
 
-      - name: 📋 Prepare Lint Comment
+      - name: Check for Changes and Prepare Comment
+        if: success() && steps.changed-files.outputs.all_changed_files != ''
         id: prepare_comment
-        if: success() && steps.changed-files
+        run: |
+          
+          changes_made=false
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}
+          do
+            if ! cmp -s "$file.bak" "$file"; then
+              changes_made=true
+              break
+            fi
+          done
+
+          if [ "$changes_made" = false ]; then
+            echo "NO_CHANGES=true" >> $GITHUB_ENV
+          else
+            formatted_diff=""
+
+            for file in ${{ steps.changed-files.outputs.all_changed_files }}
+            do
+            if [ -s "$file" ]; then  # Check if file is not empty
+                formatted_diff+=$'\n\n<details><summary>'"$file"$'</summary>\n\n```sql\n'"$(cat "$file")"$'\n```\n</details>'
+            else
+                formatted_diff+=$'\n\n'"$file is empty or not readable."
+            fi
+            done
+
+            echo "formatted_comment<<EOF" >> $GITHUB_ENV
+            echo -e "$formatted_diff" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+            echo "NO_CHANGES=false" >> $GITHUB_ENV
+          fi
+          
+
+      - name: Comment - No Changes
+        if: env.NO_CHANGES == 'true'
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: "${{ github.event.pull_request.number }}"
+          body: ✅ All sql files linted properly
+
+      - name: Create or Update Comment
+        if: env.NO_CHANGES == 'false'
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: "${{ github.event.pull_request.number }}"
+          body: |
+              ❌ Implement lint for these SQL files and commit again.
+              ${{ env.formatted_comment }}
+          token: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Set Merge Block Flag
+        if: env.NO_CHANGES == 'false'
+        run: echo "MERGE_BLOCKED=true" >> "$GITHUB_ENV"
+
+      - name: Prevent Merge
+        if: env.MERGE_BLOCKED == 'true'
+        run: |
+          echo "Merging is blocked due to the completion of comment step."
+          exit 1

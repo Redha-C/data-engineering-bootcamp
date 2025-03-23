@@ -5,17 +5,41 @@ ae_bootcamp_standupfree:
   outputs:
     ci:
       type: bigquery
-      method: oauth
+      method: service-account-json
       project: ae-bootcamp-standupfree
       dataset: dev_jaffle_shop
       threads: 4
+      keyfile_json:
+        "type": "service_account"
+        "project_id": "ae-bootcamp-standupfree"
+        "private_key_id": "b6b98e0d9a22c291e0591f2d330a6d6d55415a41"
+        "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCz86AWiK2KcyNj\nrEL6s+26SaUefO6QnuZH83pvpVznfYF+FvODAWYBTjOw/+sOWrtRcHohjeyuRrKb\nxm9sVksp4KMdDPldKmM9+dGdNhFsUYSfhROrKqMxL+16Ogwu4dFsuZh2poLIR8Ho\nFK3tK8I+UZ+5d1zvEjWqye4mAfAdj+K83TQkOXT3x8bCh6t0YC2HjcNh9dW908Wy\nQGWR9FzcgI5bmd00fxLqdpnPhjX1pIZHvTwqxxdXhqluHyO3TorlsqkXyl8tqaRl\n37iEcvvH5Lp10CYegrIZzZh8b4j1hqkkRgEd3eKNJjrxCfQhgsfkyIglFho0+XZz\nKrDP8pIBAgMBAAECggEACgcVcKwFH6Xy3ucGhHnqUWsxLFXB5YU1R+UleXs5hhzU\nTnZw82fsiz4UW1SngJFFxvABnkUOX1fJNC0GoH7eiWLfNAs5ChwGk7mMGLqele6k\n+U6tHeiuV1tYXGtHqoUi6nAdMt9sgkSdZZVha8n4dQiPYgJox1m4a9/8yVlqS/tU\ne+7OwfpM/ijB4ZMyNxKLDaKFrityF3MBdGyGnTX3rc3bWJA+2ozT0rdPj5eD48IJ\nRLWVJz1Rutyo9cHDgxX61Z+v/3AX9D4juaD6w+F4eAqpSEsSzEfqnmRp1vf9iznQ\nsM7/iFBbQzaG+wbmljEtInxEL/f87lGBDA9Zu2u+wQKBgQD2uA+cpnQcQmP8TTuk\ntEYVR38w/PKPtwpNVqWO6pN6ybgmT4febTFgaANO0kk3lJGiYdNYpNAnoSmiyBib\nKC3q/+N1toX3ThRLpHFyVa5ZKJcXXWfbeeSP0j6rwaJ3EwvYoWBnHyCBkHx+qffz\nFEDtqySA0FmGLLwfypaQ/9YglQKBgQC6uJXilPgriGdu4tsKzBsROlauYrDRvYb0\nDTxpvTVcD5dBvm4BYvHXjboStPYXGtcYI65Qif9HvlPJEqCpTkB0duB4stsFJqgi\np92QJX+iPGKS59/Noedk2f3x0fILxV0ZOtt7wr4/7jzJ6HIQ9SjxzU9xTbboROob\nGvOc9HV0vQKBgQDuSkQ55sMKcE0l6GqM39k4wD9mz0hv6jg3DlMFQCeFVsNXrUTr\nXcds98kKHiy9U+99SMLaQQUS4aPXJzAs25fN+6xziwDFJVKQ5Jj19y9Xyc50sLCY\n2JgbGNOTDIigPXMZnnP/5Z59xVGY/Q0QaCV15/BvwcxVvWtNwVu/XHoyKQKBgFtS\nbhQ8kcgQ1a25DDKSsuZRJxXxNNPQI1H3q0V4AcH96heAgKLy9p9bNNdzZCzWtr6a\nrOW9KHq5Tpc4IhXMLOAJSC4gI9i4GGGiwk1+2ZbKe9enyqDy/44mw/nimcRCCg+N\n5sz36T6xUU/a/PboQNdKeAFNZhjho7IQE3f/Y/btAoGBAKcPQEnsESGULGj6oP7d\nQyOQ3lxfY3ToTFFZwesUc04NkJXCbtp6iro5AnngCYa5qgpH3o9GL1GAIeaFgGeE\n7EHuhS7vkzNUWFls+SBUHOqbGSmMhZjrsussGMOtfII9yP/qX0AWDGe7NpiM4YJ3\nWGE3wvmzhXkkWooOImYeEaja\n-----END PRIVATE KEY-----\n"
+        "client_email": "dbt-bigquery-sa@ae-bootcamp-standupfree.iam.gserviceaccount.com"
+        "client_id": "102057152566750141953"
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth"
+        "token_uri": "https://oauth2.googleapis.com/token"
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs"
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/dbt-bigquery-sa%40ae-bootcamp-standupfree.iam.gserviceaccount.com"
+        "universe_domain": "googleapis.com"
 
     dev:
       type: bigquery
-      method: oauth
+      method: service-account-json
       project: ae-bootcamp-standupfree
       dataset: dev_jaffle_shop
       threads: 4
+      keyfile_json:
+        "type": "service_account"
+        "project_id": "ae-bootcamp-standupfree"
+        "private_key_id": "b6b98e0d9a22c291e0591f2d330a6d6d55415a41"
+        "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCz86AWiK2KcyNj\nrEL6s+26SaUefO6QnuZH83pvpVznfYF+FvODAWYBTjOw/+sOWrtRcHohjeyuRrKb\nxm9sVksp4KMdDPldKmM9+dGdNhFsUYSfhROrKqMxL+16Ogwu4dFsuZh2poLIR8Ho\nFK3tK8I+UZ+5d1zvEjWqye4mAfAdj+K83TQkOXT3x8bCh6t0YC2HjcNh9dW908Wy\nQGWR9FzcgI5bmd00fxLqdpnPhjX1pIZHvTwqxxdXhqluHyO3TorlsqkXyl8tqaRl\n37iEcvvH5Lp10CYegrIZzZh8b4j1hqkkRgEd3eKNJjrxCfQhgsfkyIglFho0+XZz\nKrDP8pIBAgMBAAECggEACgcVcKwFH6Xy3ucGhHnqUWsxLFXB5YU1R+UleXs5hhzU\nTnZw82fsiz4UW1SngJFFxvABnkUOX1fJNC0GoH7eiWLfNAs5ChwGk7mMGLqele6k\n+U6tHeiuV1tYXGtHqoUi6nAdMt9sgkSdZZVha8n4dQiPYgJox1m4a9/8yVlqS/tU\ne+7OwfpM/ijB4ZMyNxKLDaKFrityF3MBdGyGnTX3rc3bWJA+2ozT0rdPj5eD48IJ\nRLWVJz1Rutyo9cHDgxX61Z+v/3AX9D4juaD6w+F4eAqpSEsSzEfqnmRp1vf9iznQ\nsM7/iFBbQzaG+wbmljEtInxEL/f87lGBDA9Zu2u+wQKBgQD2uA+cpnQcQmP8TTuk\ntEYVR38w/PKPtwpNVqWO6pN6ybgmT4febTFgaANO0kk3lJGiYdNYpNAnoSmiyBib\nKC3q/+N1toX3ThRLpHFyVa5ZKJcXXWfbeeSP0j6rwaJ3EwvYoWBnHyCBkHx+qffz\nFEDtqySA0FmGLLwfypaQ/9YglQKBgQC6uJXilPgriGdu4tsKzBsROlauYrDRvYb0\nDTxpvTVcD5dBvm4BYvHXjboStPYXGtcYI65Qif9HvlPJEqCpTkB0duB4stsFJqgi\np92QJX+iPGKS59/Noedk2f3x0fILxV0ZOtt7wr4/7jzJ6HIQ9SjxzU9xTbboROob\nGvOc9HV0vQKBgQDuSkQ55sMKcE0l6GqM39k4wD9mz0hv6jg3DlMFQCeFVsNXrUTr\nXcds98kKHiy9U+99SMLaQQUS4aPXJzAs25fN+6xziwDFJVKQ5Jj19y9Xyc50sLCY\n2JgbGNOTDIigPXMZnnP/5Z59xVGY/Q0QaCV15/BvwcxVvWtNwVu/XHoyKQKBgFtS\nbhQ8kcgQ1a25DDKSsuZRJxXxNNPQI1H3q0V4AcH96heAgKLy9p9bNNdzZCzWtr6a\nrOW9KHq5Tpc4IhXMLOAJSC4gI9i4GGGiwk1+2ZbKe9enyqDy/44mw/nimcRCCg+N\n5sz36T6xUU/a/PboQNdKeAFNZhjho7IQE3f/Y/btAoGBAKcPQEnsESGULGj6oP7d\nQyOQ3lxfY3ToTFFZwesUc04NkJXCbtp6iro5AnngCYa5qgpH3o9GL1GAIeaFgGeE\n7EHuhS7vkzNUWFls+SBUHOqbGSmMhZjrsussGMOtfII9yP/qX0AWDGe7NpiM4YJ3\nWGE3wvmzhXkkWooOImYeEaja\n-----END PRIVATE KEY-----\n"
+        "client_email": "dbt-bigquery-sa@ae-bootcamp-standupfree.iam.gserviceaccount.com"
+        "client_id": "102057152566750141953"
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth"
+        "token_uri": "https://oauth2.googleapis.com/token"
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs"
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/dbt-bigquery-sa%40ae-bootcamp-standupfree.iam.gserviceaccount.com"
+        "universe_domain": "googleapis.com"
 
     preprod:
       type: bigquery
