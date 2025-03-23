@@ -31,6 +31,10 @@ customer_orders_summary as (
 
 ),
 
+test as (
+    SELECT 1
+),
+
 joined as (
 
     select
