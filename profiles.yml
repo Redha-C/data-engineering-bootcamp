@@ -9,7 +9,7 @@ ae_bootcamp_standupfree:
       project: ae-bootcamp-standupfree
       dataset: dev_jaffle_shop
       threads: 4
-      keyfile: "{{ env_var('GCP_SA_KEY') }}"
+      keyfile: /tmp/key.json
 
     dev:
       type: bigquery

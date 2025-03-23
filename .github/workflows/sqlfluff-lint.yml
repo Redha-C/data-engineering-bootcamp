@@ -11,6 +11,7 @@ env:
   DBT_PROFILES_DIR: ./
   DBT_TARGET: ci
   GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+  KEYFILE: /tmp/key.json
 
 jobs:
   fix-and-comment:
