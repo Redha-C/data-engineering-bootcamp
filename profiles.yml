@@ -5,20 +5,17 @@ ae_bootcamp_standupfree:
   outputs:
     ci:
       type: bigquery
-      method: service-account-json
+      method: oauth
       project: ae-bootcamp-standupfree
       dataset: dev_jaffle_shop
       threads: 4
-      keyfile_json: "{{ env_var('GCP_SA_KEY') }}"
  
-
     dev:
       type: bigquery
-      method: service-account-json
+      method: oauth
       project: ae-bootcamp-standupfree
       dataset: dev_jaffle_shop
       threads: 4
-      keyfile_json: "{{ env_var('GCP_SA_KEY') }}"
 
     preprod:
       type: bigquery
