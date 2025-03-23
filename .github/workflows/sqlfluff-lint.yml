@@ -55,7 +55,7 @@ jobs:
           dbt deps
 
       - name: Fix dbt models
-        continue-on-error: true
+        continue-on-error: false
         if: steps.changed-files.outputs.all_changed_files != ''
         run: |
           
