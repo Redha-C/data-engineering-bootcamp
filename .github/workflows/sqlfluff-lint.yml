@@ -59,7 +59,7 @@ jobs:
         if: steps.changed-files.outputs.all_changed_files != ''
         run: |
           
-          sqlfluff fix ${{ steps.changed-files.outputs.all_changed_files }}
+          sqlfluff lint ${{ steps.changed-files.outputs.all_changed_files }}
 
       - name: Set Merge Block Flag
         if: env.NO_CHANGES == 'false'
