@@ -64,10 +64,3 @@ jobs:
         if: steps.changed-files.outputs.all_changed_files != ''
         run: |
           sqlfluff lint ${{ steps.changed-files.outputs.all_changed_files }}
-
-      # 🚫 Step 10 (Optional): Prevent PR merge manually by failing the job if merge blocked
-      - name: Prevent Merge
-        if: env.MERGE_BLOCKED == 'true'
-        run: |
-          echo "Merging is blocked due to SQL linting errors."
-          exit 1
