@@ -2,7 +2,7 @@ with
 
 locations as (
 
-    select * from {{ ref('stg_locations') }}
+    select count(*) from {{ ref('stg_locations') }}
 
 )
 
