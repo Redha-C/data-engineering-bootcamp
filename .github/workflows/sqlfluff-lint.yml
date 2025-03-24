@@ -52,14 +52,6 @@ jobs:
         with:
           files: models/**/*.sql
 
-      # 💾 Step 6 (Optional): Backup original files — not strictly needed for linting (used more for fixing)
-      - name: Backup Original Files
-        run: |
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}
-          do
-            cp "$file" "$file.bak"
-          done
-
       # 📥 Step 7: Install dbt packages if any are specified in packages.yml
       - name: Install dbt packages
         run: |
@@ -72,11 +64,6 @@ jobs:
         if: steps.changed-files.outputs.all_changed_files != ''
         run: |
           sqlfluff lint ${{ steps.changed-files.outputs.all_changed_files }}
-
-      # 🔒 Step 9 (Optional): Block merging if required — not fully functional unless you set env.NO_CHANGES before
-      - name: Set Merge Block Flag
-        if: env.NO_CHANGES == 'false'
-        run: echo "MERGE_BLOCKED=true" >> "$GITHUB_ENV"
 
       # 🚫 Step 10 (Optional): Prevent PR merge manually by failing the job if merge blocked
       - name: Prevent Merge
