@@ -1,5 +1,8 @@
+# ✅ Workflow to lint dbt models using SQLFluff on every PR targeting the main branch
+
 name: SQLFluff lint dbt models
 
+# 🟢 Trigger this workflow on pull requests to 'main' where SQL files in 'models/' are changed
 on:
   pull_request:
     branches:
@@ -7,66 +10,57 @@ on:
     paths:
       - 'models/**/*.sql'
 
+# 🧪 Global environment variables for the job
 env:
-  DBT_PROFILES_DIR: ./
-  DBT_TARGET: ci
-  DBT_PR_ID: "${{github.event.number}}"
+  DBT_PROFILES_DIR: ./                      # Use the current directory as the dbt profiles location
+  DBT_TARGET: ci                            # Set the dbt target (must match your profiles.yml)
+  DBT_PR_ID: "${{ github.event.number }}"   # Capture the PR number (can be used for commenting, tagging, etc.)
 
 jobs:
   sqlfluff-lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest   # 🖥️ Use the latest Ubuntu runner
+
     steps:
+      # 🧾 Step 1: Checkout the code from the PR
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 2  # Shallow clone with history of last 2 commits
 
+      # 🐍 Step 2: Set up Python environment for SQLFluff
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
 
+      # 📦 Step 3: Install dependencies (dbt, sqlfluff, etc.)
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
 
+      # 🔐 Step 4: Authenticate to Google Cloud (for dbt to work with BigQuery)
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
-          export_environment_variables: true
+          export_environment_variables: true  # Expose creds as env vars for dbt/sqlfluff
 
+      # 🧾 Step 5: Detect only the SQL files that were changed in the PR
       - name: Changed Files
         id: changed-files
         uses: tj-actions/changed-files@v42.0.2
         with:
           files: models/**/*.sql
 
-      - name: Backup Original Files
-        run: |
-          
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}
-          do
-            cp "$file" "$file.bak"
-          done
-          
+      # 📥 Step 7: Install dbt packages if any are specified in packages.yml
       - name: Install dbt packages
         run: |
           dbt deps
 
+      # ✅ Step 8: Run SQLFluff linter on changed files
+      # ❌ This step will FAIL the workflow if there are any linting errors
       - name: Lint dbt models
-        continue-on-error: false
+        continue-on-error: false  # Important: fail if linting fails
         if: steps.changed-files.outputs.all_changed_files != ''
         run: |
-          
           sqlfluff lint ${{ steps.changed-files.outputs.all_changed_files }}
-
-      - name: Set Merge Block Flag
-        if: env.NO_CHANGES == 'false'
-        run: echo "MERGE_BLOCKED=true" >> "$GITHUB_ENV"
-
-      - name: Prevent Merge
-        if: env.MERGE_BLOCKED == 'true'
-        run: |
-          echo "Merging is blocked due to the completion of comment step."
-          exit 1
