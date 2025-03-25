@@ -1,0 +1,67 @@
+name: dbt build on BigQuery (CI)
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  DBT_PROFILES_DIR: ./
+  DBT_TARGET: ci
+  DBT_PR_ID: ${{ github.event.number }}
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  # Single deploy job since we're just deploying
+  launch-dbt-build:
+    runs-on: ubuntu-latest   # 🖥️ Use the latest Ubuntu runner
+    steps:
+      - name: Pre/Post Cleaners
+        uses: dktunited/.github/actions/cleaner@main
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+        
+      - name: Update dbt deps
+        run: dbt deps
+
+      # 🔐 Step 4: Authenticate to Google Cloud (for dbt to work with BigQuery)
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+          export_environment_variables: true  # Expose creds as env vars for dbt/sqlfluff
+
+      - name: Pull Last manifest
+        run: |
+          make pull-manifest
+        env:
+          ENV: preprod
+
+      - name: Run the modified models
+        run: |
+          if [ -f "manifest.json" ]; then
+            echo "Manifest exists, running with defer and state."
+            dbt seed -s state:modified --state .
+            dbt run --full-refresh --select state:modified+ --defer --state .
+          else
+            echo "Manifest does not exist, running without defer and state."
+            dbt seed
+            dbt run --full-refresh
+          fi
