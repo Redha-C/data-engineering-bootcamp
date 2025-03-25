@@ -54,4 +54,4 @@ jobs:
 
       # 🚀 Step 5: Run dbt build against the BigQuery CI target
       - name: Run dbt build
-        run: dbt build --select state:modified+ --target ci 
+        run: dbt build --target ci 
