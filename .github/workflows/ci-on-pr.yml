@@ -28,9 +28,6 @@ jobs:
   launch-dbt-build:
     runs-on: ubuntu-latest   # 🖥️ Use the latest Ubuntu runner
     steps:
-      - name: Pre/Post Cleaners
-        uses: dktunited/.github/actions/cleaner@main
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
