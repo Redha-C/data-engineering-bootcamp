@@ -1,4 +1,4 @@
-name: Delete CI Models after PR merge
+name: delete ci models after PR merge
 
 on:
   pull_request:
