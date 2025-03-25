@@ -48,20 +48,5 @@ jobs:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
           export_environment_variables: true  # Expose creds as env vars for dbt/sqlfluff
 
-      - name: Pull Last manifest
-        run: |
-          make pull-manifest
-        env:
-          ENV: preprod
-
-      - name: Run the modified models
-        run: |
-          if [ -f "manifest.json" ]; then
-            echo "Manifest exists, running with defer and state."
-            dbt seed -s state:modified --state .
-            dbt run --full-refresh --select state:modified+ --defer --state .
-          else
-            echo "Manifest does not exist, running without defer and state."
-            dbt seed
-            dbt run --full-refresh
-          fi
+      - name: Run dbt build
+        run: dbt build --target ci
