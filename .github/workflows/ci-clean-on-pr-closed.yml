@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   # Single deploy job since we're just deploying
-  clean-ci:
+  clean-ci-models:
     runs-on: ubuntu-latest   # 🖥️ Use latest Ubuntu VM image
     steps:
       - name: Checkout Repository
