@@ -1,4 +1,4 @@
-{% macro prefix_dbt_pr_id_to_ci_models(custom_alias_name=none, node=none) -%}
+{% macro generate_alias_name(custom_alias_name=none, node=none) -%}
     {%- if target.name == 'ci' -%}
         {{ 'pr_' ~ env_var("DBT_PR_ID") ~ '_' ~ node.name }}
     {%- else -%}
