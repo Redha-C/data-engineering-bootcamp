@@ -1,0 +1,38 @@
+name: Delete CI Models after PR merge
+
+on:
+  pull_request:
+    types: [closed]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  DBT_PROFILES_DIR: ./                    # Where dbt will find the profiles.yml file
+  DBT_TARGET: ci                          # Which target to use in profiles.yml (BigQuery CI environment)
+  DBT_PR_ID: ${{ github.event.number }}   # PR ID, can be used for dynamic comments, logs, etc.
+
+
+# 🔐 Set GitHub token permissions — useful if deploying docs or pages later
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  # Single deploy job since we're just deploying
+  clean-ci:
+    runs-on: ubuntu-latest   # 🖥️ Use latest Ubuntu VM image
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run delete_ci_models macro
+        run: |
+          dbt deps
+          dbt run-operation delete_ci_models --args "{ dbt_pr_id : $DBT_PR_ID, materialization: view }"
+          dbt run-operation delete_ci_models --args "{ dbt_pr_id : $DBT_PR_ID, materialization: table }"
