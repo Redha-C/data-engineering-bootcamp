@@ -1,6 +1,6 @@
 # ✅ Workflow to lint dbt models using SQLFluff on every PR targeting the main branch
 
-name: SQLFluff lint dbt models
+name: SQLFluff lint dbt models (CI)
 
 # 🟢 Trigger this workflow on pull requests to 'main' where SQL files in 'models/' are changed
 on:

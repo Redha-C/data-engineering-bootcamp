@@ -1,0 +1,57 @@
+# 🎯 Workflow Name
+name: dbt build (CI)
+
+# 🛎️ Trigger the workflow when a PR is opened or updated
+on:
+  pull_request:
+    types: [opened, synchronize]  # Trigger on new PRs or when commits are pushed to an open PR
+
+  # 🖐️ Allow manual execution from the Actions tab (useful for testing)
+  workflow_dispatch:
+
+# 🌍 Global environment variables
+env:
+  DBT_PROFILES_DIR: ./                    # Where dbt will find the profiles.yml file
+  DBT_TARGET: ci                          # Which target to use in profiles.yml (BigQuery CI environment)
+  DBT_PR_ID: ${{ github.event.number }}   # PR ID, can be used for dynamic comments, logs, etc.
+
+# 🔐 Set GitHub token permissions — useful if deploying docs or pages later
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 🚥 Avoid overlapping jobs — only the latest PR run will be active
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+# 🛠️ The actual job: Run dbt build
+jobs:
+  launch-dbt-build:
+    runs-on: ubuntu-latest   # 🖥️ Use latest Ubuntu VM image
+
+    steps:
+      # 📥 Step 1: Checkout your code from GitHub
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 🐍 Step 2: Install Python dependencies from requirements.txt (includes dbt-bigquery, etc.)
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      # 📦 Step 3: Install dbt packages from packages.yml (if any)
+      - name: Update dbt deps
+        run: dbt deps
+
+      # 🔐 Step 4: Authenticate to Google Cloud using a Service Account key from GitHub Secrets
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+          export_environment_variables: true  # Sets GOOGLE_APPLICATION_CREDENTIALS internally for dbt
+
+      # 🚀 Step 5: Run dbt build against the BigQuery CI target
+      - name: Run dbt build
+        run: dbt build --target ci 
