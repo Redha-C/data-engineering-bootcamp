@@ -1,5 +1,5 @@
 # 🎯 Workflow Name
-name: dbt build on BigQuery (CI)
+name: dbt build (CI)
 
 # 🛎️ Trigger the workflow when a PR is opened or updated
 on:
