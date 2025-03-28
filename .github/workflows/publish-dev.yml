@@ -46,7 +46,7 @@ jobs:
       - name: Get Base Version from GitHub Release
         id: version
         run: |
-          # Try fetching the latest GitHub release tag (e.g., 1.0.0)
+          # Try fetching the latest GitHub release tag (e.g., 1.0.0) 
           BASE="${GITHUB_REF#refs/tags/}"
 
           # If no release has been created yet (BASE is empty), fallback to default version "1.0.0"
