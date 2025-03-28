@@ -47,7 +47,7 @@ jobs:
         id: version
         run: |
           # Try fetching the latest GitHub release tag (e.g., 1.0.0)
-          BASE=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r '.tag_name // empty')
+          BASE="${GITHUB_REF#refs/tags/}"
 
           # If no release has been created yet (BASE is empty), fallback to default version "1.0.0"
           if [ -z "$BASE" ]; then
