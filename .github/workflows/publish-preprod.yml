@@ -51,8 +51,17 @@ jobs:
             BASE="1.0.0"
           fi
 
-          # Count how many commits have been made since the latest release tag
-          COUNT=$(git rev-list --count $(git describe --tags --abbrev=0)..HEAD)
+          # Try to find the latest Git tag in the repo (e.g., from 'git tag')
+          # If no tag exists, fallback to commit count from HEAD to init RC1
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -z "$LAST_TAG" ]; then
+            # No previous tag found, default to RC1
+            COUNT=1
+          else
+            # Tag exists, count commits since the last tag
+            COUNT=$(git rev-list --count ${LAST_TAG}..HEAD)
+          fi
 
           # Generate the Docker tag with RC version suffix, like "1.0.0-RC2"
           TAG="${BASE}-RC${COUNT}"
