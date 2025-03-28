@@ -1,69 +1,67 @@
-# 🐳 GitHub Action to build and publish a Docker image of the dbt project to the dev environment (Artifact Registry)
+# 🐳 GitHub Action to build and publish a Docker image of the dbt project to the preprod environment (Artifact Registry)
 
-name: Publish dbt project on dev environment
+name: Publish dbt project on preprod environment
 
-# 📦 Trigger this workflow on push to feature or fix branches, and allow manual dispatch
+# 📦 Trigger this workflow when code is pushed to the main branch (e.g., PR merged)
 on:
   push:
     branches:
-      - feat*/*   # Any branch starting with feat (feature branches)
-      - fix*/*    # Any branch starting with fix (bugfix branches)
-  workflow_dispatch:  # Allows you to run the workflow manually from the Actions UI
+      - main
+  workflow_dispatch:  # Manual trigger (optional)
 
 # 🌍 Global environment variables
 env:
-  REGION: us                                 # Your GCP region
-  PROJECT_ID: ae-bootcamp-standupfree        # Your GCP project ID
-  REPOSITORY: dbt-images-dev                 # Artifact Registry repo name for dev
-  IMAGE_NAME: dbt-jaffle-shop                # Docker image name
+  REGION: us                                      # GCP region (same as Artifact Registry)
+  PROJECT_ID: ae-bootcamp-standupfree             # GCP project ID
+  REPOSITORY: dbt-images-preprod                  # Artifact Registry repo name for preprod
+  IMAGE_NAME: dbt-jaffle-shop                     # Docker image name
 
 jobs:
-  build-and-push-dev:
-    runs-on: ubuntu-latest   # Use the latest Ubuntu runner
+  build-and-push-preprod:
+    runs-on: ubuntu-latest
 
     steps:
-      # 📥 Step 1: Checkout the source code from the GitHub repo
+      # 📥 Step 1: Checkout the source code with full history
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0           # Fetch all history
-          ref: ${{ github.ref }}   # Ensure correct branch is checked out
+          fetch-depth: 0           # Fetch all commits to calculate RC version properly
+          ref: ${{ github.ref }}   # Ensure current branch is checked out
 
-      # 🔐 Step 2: Authenticate to Google Cloud using service account credentials
+      # 🔐 Step 2: Authenticate to Google Cloud with service account
       - name: Set up Docker credentials
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: '${{ secrets.GCP_SA_KEY }}'  # GCP SA Key stored in GitHub Secrets
-          export_environment_variables: true             # Export creds as environment variables
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+          export_environment_variables: true
 
-      # ⚙️ Step 3: Configure Docker to use Google Artifact Registry for your GCP region
+      # ⚙️ Step 3: Configure Docker for Artifact Registry
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
-      # 🏷️ Step 4: Dynamically compute version tag for the Docker image
-      # - Uses the latest GitHub release tag as base (e.g., 1.0.0)
-      # - Appends -dev + commit count (e.g., 1.0.0-dev24)
+      # 🏷️ Step 4: Compute the Docker image tag using GitHub release and commit count
       - name: Get Base Version from GitHub Release
         id: version
         run: |
           # Try fetching the latest GitHub release tag (e.g., 1.0.0)
           BASE=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r '.tag_name // empty')
 
-          # If no release exists, fallback to default version
+          # If no release has been created yet (BASE is empty), fallback to default version "1.0.0"
           if [ -z "$BASE" ]; then
-            BASE="1.0.0"  # Fallback if no release exists yet on GitHub
+            BASE="1.0.0"
           fi
 
-          # Count commits ahead of main (i.e., number of changes made on the feature branch)
-          COUNT=$(git rev-list --count origin/main..HEAD)
+          # Count how many commits have been made since the latest release tag
+          COUNT=$(git rev-list --count $(git describe --tags --abbrev=0)..HEAD)
 
-          # Create tag in format: 1.0.0-dev{count}
-          TAG="${BASE}-dev${COUNT}"
+          # Generate the Docker tag with RC version suffix, like "1.0.0-RC2"
+          TAG="${BASE}-RC${COUNT}"
 
+          # Output the tag for use in subsequent GitHub Action steps
           echo "tag=$TAG"
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-      # 🏗️ Step 5: Build the Docker image with the computed tag
+      # 🏗️ Step 5: Build the Docker image
       - name: Build Docker image
         run: |
           docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.tag }} .

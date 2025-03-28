@@ -49,7 +49,7 @@ jobs:
           # Try fetching the latest GitHub release tag (e.g., 1.0.0)
           BASE=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r '.tag_name // empty')
 
-          # If no release exists, fallback to default version
+          # If no release has been created yet (BASE is empty), fallback to default version "1.0.0"
           if [ -z "$BASE" ]; then
             BASE="1.0.0"  # Fallback if no release exists yet on GitHub
           fi
@@ -60,6 +60,7 @@ jobs:
           # Create tag in format: 1.0.0-dev{count}
           TAG="${BASE}-dev${COUNT}"
 
+          # Output the tag for use in subsequent GitHub Action steps
           echo "tag=$TAG"
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
