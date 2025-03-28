@@ -1,0 +1,81 @@
+# 🐳 GitHub Action to build and publish a Docker image of the dbt project to the preprod environment (Artifact Registry)
+
+name: Publish dbt project on preprod environment
+
+# 📦 Trigger this workflow when code is pushed to the main branch (e.g., PR merged)
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Manual trigger (optional)
+
+# 🌍 Global environment variables
+env:
+  REGION: us                                      # GCP region (same as Artifact Registry)
+  PROJECT_ID: ae-bootcamp-standupfree             # GCP project ID
+  REPOSITORY: dbt-images-preprod                  # Artifact Registry repo name for preprod
+  IMAGE_NAME: dbt-jaffle-shop                     # Docker image name
+
+jobs:
+  build-and-push-preprod:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 📥 Step 1: Checkout the source code with full history
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0           # Fetch all commits to calculate RC version properly
+          ref: ${{ github.ref }}   # Ensure current branch is checked out
+
+      # 🔐 Step 2: Authenticate to Google Cloud with service account
+      - name: Set up Docker credentials
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+          export_environment_variables: true
+
+      # ⚙️ Step 3: Configure Docker for Artifact Registry
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      # 🏷️ Step 4: Compute the Docker image tag using GitHub release and commit count
+      - name: Get Base Version from GitHub Release
+        id: version
+        run: |
+          # Try fetching the latest GitHub release tag (e.g., 1.0.0)
+          BASE=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r '.tag_name // empty')
+
+          # If no release has been created yet (BASE is empty), fallback to default version "1.0.0"
+          if [ -z "$BASE" ]; then
+            BASE="1.0.0"
+          fi
+
+          # Try to find the latest Git tag in the repo (e.g., from 'git tag')
+          # If no tag exists, fallback to commit count from HEAD to init RC1
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -z "$LAST_TAG" ]; then
+            # No previous tag found, default to RC1
+            COUNT=1
+          else
+            # Tag exists, count commits since the last tag
+            COUNT=$(git rev-list --count ${LAST_TAG}..HEAD)
+          fi
+
+          # Generate the Docker tag with RC version suffix, like "1.0.0-RC2"
+          TAG="${BASE}-RC${COUNT}"
+
+          # Output the tag for use in subsequent GitHub Action steps
+          echo "tag=$TAG"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      # 🏗️ Step 5: Build the Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.tag }} .
+
+      # 🚀 Step 6: Push the Docker image to Artifact Registry
+      - name: Push Docker image
+        run: |
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.tag }}
