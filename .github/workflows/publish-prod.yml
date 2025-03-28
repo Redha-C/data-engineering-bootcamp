@@ -40,7 +40,7 @@ jobs:
 
       # 🏷️ Step 4: Extract the tag that triggered the workflow (e.g., "1.0.0")
       - name: Extract Tag
-        id: tag
+        id: version
         run: |
           TAG_NAME="${GITHUB_REF#refs/tags/}"  # Safely gets the tag from full ref
           echo "tag=$TAG_NAME"
