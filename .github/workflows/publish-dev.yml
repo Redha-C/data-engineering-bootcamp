@@ -43,9 +43,13 @@ jobs:
       - name: Get Base Version from GitHub Release
         id: version
         run: |
-          BASE=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r '.tag_name')
+          BASE=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r '.tag_name // empty')
+          if [ -z "$BASE" ]; then
+            BASE="1.0.0"  # Fallback if no release exists yet
+          fi
           COUNT=$(git rev-list --count HEAD)
           TAG="${BASE}-dev${COUNT}"
+          echo "tag=$TAG"
           echo "tag=$TAG" >> $GITHUB_OUTPUT  # Store the tag in GitHub Actions output
 
       # 🏗️ Step 5: Build the Docker image with the computed tag
