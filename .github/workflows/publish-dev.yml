@@ -40,10 +40,8 @@ jobs:
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
-
       # 🏷️ Step 4: Dynamically compute version tag for the Docker image
-      # - Uses the latest GitHub release tag as base (e.g., 1.0.0)
-      # - Appends -dev + commit count (e.g., 1.0.0-dev24)
+      # - Uses the tag entered in the VERSION file (e.g., 1.0.0-dev1)
       - name: Compute dev version tag
         id: version
         run: |
