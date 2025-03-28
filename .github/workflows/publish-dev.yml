@@ -25,6 +25,9 @@ jobs:
       # 📥 Step 1: Checkout the source code from the GitHub repo
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0           # Fetch all history
+          ref: ${{ github.ref }}   # Ensure correct branch is checked out
 
       # 🔐 Step 2: Authenticate to Google Cloud using service account credentials
       - name: Set up Docker credentials
