@@ -41,27 +41,14 @@ jobs:
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
       # 🏷️ Step 4: Dynamically compute version tag for the Docker image
-      # - Uses the latest GitHub release tag as base (e.g., 1.0.0)
-      # - Appends -dev + commit count (e.g., 1.0.0-dev24)
-      - name: Get Base Version from GitHub Release
+      # - Uses the tag entered in the VERSION file (e.g., 1.0.0-dev1)
+      - name: Compute dev version tag
         id: version
         run: |
-          # Try fetching the latest GitHub release tag (e.g., 1.0.0)
-          BASE=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r '.tag_name // empty')
-
-          # If no release has been created yet (BASE is empty), fallback to default version "1.0.0"
-          if [ -z "$BASE" ]; then
-            BASE="1.0.0"  # Fallback if no release exists yet on GitHub
-          fi
-
-          # Count commits ahead of main (i.e., number of changes made on the feature branch)
-          COUNT=$(git rev-list --count origin/main..HEAD)
-
-          # Create tag in format: 1.0.0-dev{count}
-          TAG="${BASE}-dev${COUNT}"
+          # Retrieve the dev version from the VERSION file
+          TAG=$(sed -n '1p' VERSION)
 
           # Output the tag for use in subsequent GitHub Action steps
-          echo "tag=$TAG"
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
       # 🏗️ Step 5: Build the Docker image with the computed tag
