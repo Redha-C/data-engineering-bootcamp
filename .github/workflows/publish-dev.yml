@@ -1,0 +1,55 @@
+name: Docker Build & Push
+
+on:
+  push:
+    branches:
+      - dev
+      - preprod
+      - main
+  workflow_dispatch:
+
+env:
+  REGION: europe-west1
+  PROJECT_ID: your-gcp-project-id
+  REPOSITORY: dbt-images
+  IMAGE_NAME: dbt-jaffle-shop
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker credentials
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+          export_environment_variables: true
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Extract Version Tag
+        id: version
+        run: |
+          BASE="1.0.0"
+          if [[ "${GITHUB_REF_NAME}" == "dev" ]]; then
+            COUNT=$(git rev-list --count HEAD)
+            TAG="${BASE}-dev${COUNT}"
+          elif [[ "${GITHUB_REF_NAME}" == "preprod" ]]; then
+            COUNT=$(git rev-list --count HEAD)
+            TAG="${BASE}-RC${COUNT}"
+          else
+            TAG="${BASE}"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.tag }} .
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.tag }}
