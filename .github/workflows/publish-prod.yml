@@ -1,19 +1,18 @@
-# 🐳 GitHub Action to build and publish a Docker image of the dbt project to the preprod environment (Artifact Registry)
+# 🐳 GitHub Action to build and publish a Docker image of the dbt project to the prod environment (Artifact Registry)
 
 name: Publish dbt project on prod environment
 
-# 📦 Trigger this workflow when code is pushed to the main branch (e.g., PR merged)
+# 📦 Trigger this workflow when a tag is created
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:  # Manual trigger (optional)
+    tags:
+      - "*"
 
 # 🌍 Global environment variables
 env:
   REGION: us                                      # GCP region (same as Artifact Registry)
   PROJECT_ID: ae-bootcamp-standupfree             # GCP project ID
-  REPOSITORY: dbt-images-preprod                  # Artifact Registry repo name for preprod
+  REPOSITORY: dbt-images-prod                     # Artifact Registry repo name for prod
   IMAGE_NAME: dbt-jaffle-shop                     # Docker image name
 
 jobs:
@@ -39,36 +38,13 @@ jobs:
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
-      # 🏷️ Step 4: Compute the Docker image tag using GitHub release and commit count
-      - name: Get Base Version from GitHub Release
-        id: version
+      # 🏷️ Step 4: Extract the tag that triggered the workflow (e.g., "1.0.0")
+      - name: Extract Tag
+        id: tag
         run: |
-          # Try fetching the latest GitHub release tag (e.g., 1.0.0)
-          BASE=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r '.tag_name // empty')
-
-          # If no release has been created yet (BASE is empty), fallback to default version "1.0.0"
-          if [ -z "$BASE" ]; then
-            BASE="1.0.0"
-          fi
-
-          # Try to find the latest Git tag in the repo (e.g., from 'git tag')
-          # If no tag exists, fallback to commit count from HEAD to init RC1
-          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-
-          if [ -z "$LAST_TAG" ]; then
-            # No previous tag found, default to RC1
-            COUNT=1
-          else
-            # Tag exists, count commits since the last tag
-            COUNT=$(git rev-list --count ${LAST_TAG}..HEAD)
-          fi
-
-          # Generate the Docker tag with RC version suffix, like "1.0.0-RC2"
-          TAG="${BASE}-RC${COUNT}"
-
-          # Output the tag for use in subsequent GitHub Action steps
-          echo "tag=$TAG"
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          echo "tag=$TAG_NAME"
+          echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
 
       # 🏗️ Step 5: Build the Docker image
       - name: Build Docker image
