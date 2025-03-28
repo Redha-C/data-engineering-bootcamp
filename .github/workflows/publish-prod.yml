@@ -42,9 +42,9 @@ jobs:
       - name: Extract Tag
         id: tag
         run: |
-          TAG_NAME="${GITHUB_REF##*/}"  # Safely gets the tag from full ref
+          TAG_NAME="${GITHUB_REF#refs/tags/}"  # Safely gets the tag from full ref
           echo "tag=$TAG_NAME"
-          echo "tag=$TAG_NAME" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
 
       # 🏗️ Step 5: Build the Docker image
       - name: Build Docker image
