@@ -1,55 +1,59 @@
-name: Docker Build & Push
+# 🐳 GitHub Action to build and publish a Docker image of the dbt project to the dev environment (Artifact Registry)
 
+name: Publish dbt project on dev environment
+
+# 📦 Trigger this workflow on push to feature or fix branches, and allow manual dispatch
 on:
   push:
     branches:
-      - dev
-      - preprod
-      - main
-  workflow_dispatch:
+      - feat*/*   # Any branch starting with feat (feature branches)
+      - fix*/*    # Any branch starting with fix (bugfix branches)
+  workflow_dispatch:  # Allows you to run the workflow manually from the Actions UI
 
+# 🌍 Global environment variables
 env:
-  REGION: europe-west1
-  PROJECT_ID: your-gcp-project-id
-  REPOSITORY: dbt-images
-  IMAGE_NAME: dbt-jaffle-shop
+  REGION: US                                 # Your GCP region
+  PROJECT_ID: ae-bootcamp-standupfree        # Your GCP project ID
+  REPOSITORY: dbt-images                     # Artifact Registry repo name
+  IMAGE_NAME: dbt-jaffle-shop                # Docker image name
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
+  build-and-push-dev:
+    runs-on: ubuntu-latest   # Use the latest Ubuntu runner
 
     steps:
+      # 📥 Step 1: Checkout the source code from the GitHub repo
       - name: Checkout
         uses: actions/checkout@v4
 
+      # 🔐 Step 2: Authenticate to Google Cloud using service account credentials
       - name: Set up Docker credentials
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: '${{ secrets.GCP_SA_KEY }}'
-          export_environment_variables: true
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'  # GCP SA Key stored in GitHub Secrets
+          export_environment_variables: true             # Export creds as environment variables
 
+      # ⚙️ Step 3: Configure Docker to use Google Artifact Registry for your GCP region
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
-      - name: Extract Version Tag
+      # 🏷️ Step 4: Dynamically compute version tag for the Docker image
+      # - Uses the latest GitHub release tag as base (e.g., 1.0.0)
+      # - Appends -dev + commit count (e.g., 1.0.0-dev24)
+      - name: Get Base Version from GitHub Release
         id: version
         run: |
-          BASE="1.0.0"
-          if [[ "${GITHUB_REF_NAME}" == "dev" ]]; then
-            COUNT=$(git rev-list --count HEAD)
-            TAG="${BASE}-dev${COUNT}"
-          elif [[ "${GITHUB_REF_NAME}" == "preprod" ]]; then
-            COUNT=$(git rev-list --count HEAD)
-            TAG="${BASE}-RC${COUNT}"
-          else
-            TAG="${BASE}"
-          fi
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          BASE=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r '.tag_name')
+          COUNT=$(git rev-list --count HEAD)
+          TAG="${BASE}-dev${COUNT}"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT  # Store the tag in GitHub Actions output
 
+      # 🏗️ Step 5: Build the Docker image with the computed tag
       - name: Build Docker image
         run: |
           docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.tag }} .
 
+      # 🚀 Step 6: Push the Docker image to Artifact Registry
       - name: Push Docker image
         run: |
           docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.tag }}
