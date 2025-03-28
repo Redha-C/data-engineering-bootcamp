@@ -39,12 +39,6 @@ jobs:
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
-      - name: Read version from VERSION file
-        id: read_version
-        run: |
-          BASE=$(cat VERSION)
-          echo "next_version=$BASE" >> $GITHUB_OUTPUT
-
       # 🏷️ Step 4: Dynamically compute version tag for the Docker image
       # - Uses the tag entered in the VERSION file (e.g., 1.0.0-RC1)
       - name: Compute preprod version tag
