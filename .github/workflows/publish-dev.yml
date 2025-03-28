@@ -12,7 +12,7 @@ on:
 
 # 🌍 Global environment variables
 env:
-  REGION: US                                 # Your GCP region
+  REGION: us                                 # Your GCP region
   PROJECT_ID: ae-bootcamp-standupfree        # Your GCP project ID
   REPOSITORY: dbt-images                     # Artifact Registry repo name
   IMAGE_NAME: dbt-jaffle-shop                # Docker image name
