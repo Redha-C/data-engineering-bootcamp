@@ -46,11 +46,11 @@ jobs:
           echo "next_version=$BASE" >> $GITHUB_OUTPUT
 
       # 🏷️ Step 4: Dynamically compute version tag for the Docker image
-      # - Uses the tag entered in the VERSION file (e.g., 1.0.0-dev1)
+      # - Uses the tag entered in the VERSION file (e.g., 1.0.0-RC1)
       - name: Compute preprod version tag
         id: version
         run: |
-          # Retrieve the dev version from the VERSION file
+          # Retrieve the preprod version from the VERSION file
           TAG=$(sed -n '2p' VERSION)
 
           # Output the tag for use in subsequent GitHub Action steps
