@@ -42,7 +42,7 @@ with DAG(
     		cluster_name="autopilot-cluster-1",
    	 	namespace="default",
 		do_xcom_push=True,
-    		image="us-docker.pkg.dev/ae-bootcamp-standupfree/dbt-images-prod/dbt-jaffle-shop:latest",
+    		image=IMAGE_URI,
     		cmds=["dbt", "build", "--target", "prod"],
     		name="dbt_jaffle_shop_job",
 		in_cluster=False,
