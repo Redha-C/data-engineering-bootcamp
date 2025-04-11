@@ -1,3 +1,4 @@
+# dbt requirements
 dbt-bigquery==1.9.1
 sqlfluff==3.3.1
 sqlfluff-templater-dbt==3.3.1
