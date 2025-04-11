@@ -35,16 +35,16 @@ with DAG(
 ) as dag:
 
     run_dbt = GKEStartPodOperator(
-    	task_id="dbt_jaffle_shop_dag",
+    		task_id="dbt_jaffle_shop_dag",
 		project_id="ae-bootcamp-standupfree",
 		service_account_name="k8s-dbt-job",
-        location="us-central1",
-        cluster_name="autopilot-cluster-1",
+    		location="us-central1",
+    		cluster_name="autopilot-cluster-1",
    	 	namespace="default",
 		do_xcom_push=True,
-        image=IMAGE_URI,
-        cmds=["dbt", "build", "--target", "prod"],
-        name="dbt_jaffle_shop_job",
+    		image="us-docker.pkg.dev/ae-bootcamp-standupfree/dbt-images-prod/dbt-jaffle-shop:latest",
+    		cmds=["dbt", "build", "--target", "prod"],
+    		name="dbt_jaffle_shop_job",
 		in_cluster=False,
 		on_finish_action="delete_pod",
     )
