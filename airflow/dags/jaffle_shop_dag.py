@@ -28,7 +28,7 @@ with DAG(
     dag_id="dbt_jaffle_shop_dag",
     default_args=default_args,
     description="Run dbt jaffle shop image on GKE",
-    schedule="0 5 * * *",  # Runs everydays at 5am
+    schedule="0 5 * * *",  # Runs everyday at 5am
     start_date=pendulum.today('UTC').add(days=-1),
     catchup=False,
     tags=["dbt", "jaffle_shop" , "daily" , "ae_bootcamp", "standupfree"],
