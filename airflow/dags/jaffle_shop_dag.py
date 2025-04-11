@@ -28,23 +28,23 @@ with DAG(
     dag_id="dbt_jaffle_shop_dag",
     default_args=default_args,
     description="Run dbt jaffle shop image on GKE",
-    schedule="@daily",  # Adjust as needed
+    schedule="0 5 * * *",  # Runs everydays at 5am
     start_date=pendulum.today('UTC').add(days=-1),
     catchup=False,
     tags=["dbt", "jaffle_shop" , "daily" , "ae_bootcamp", "standupfree"],
 ) as dag:
 
     run_dbt = GKEStartPodOperator(
-    		task_id="dbt_jaffle_shop_dag",
+    	task_id="dbt_jaffle_shop_dag",
 		project_id="ae-bootcamp-standupfree",
 		service_account_name="k8s-dbt-job",
-    		location="us-central1",
-    		cluster_name="autopilot-cluster-1",
+        location="us-central1",
+        cluster_name="autopilot-cluster-1",
    	 	namespace="default",
 		do_xcom_push=True,
-    		image="us-docker.pkg.dev/ae-bootcamp-standupfree/dbt-images-prod/dbt-jaffle-shop:latest",
-    		cmds=["dbt", "build", "--target", "prod"],
-    		name="dbt_jaffle_shop_job",
+        image=IMAGE_URI,
+        cmds=["dbt", "build", "--target", "prod"],
+        name="dbt_jaffle_shop_job",
 		in_cluster=False,
 		on_finish_action="delete_pod",
     )
