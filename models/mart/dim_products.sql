@@ -6,4 +6,5 @@ products as (
 
 )
 
-select * from products
+select * from 
+products
