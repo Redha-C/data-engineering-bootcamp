@@ -43,3 +43,4 @@ jobs:
           dbt deps
           dbt run-operation delete_ci_models --args "{ dbt_pr_id : $DBT_PR_ID, materialization: view }"
           dbt run-operation delete_ci_models --args "{ dbt_pr_id : $DBT_PR_ID, materialization: table }"
+ 
