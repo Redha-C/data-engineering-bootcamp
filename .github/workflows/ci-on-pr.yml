@@ -52,6 +52,10 @@ jobs:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
           export_environment_variables: true  # Sets GOOGLE_APPLICATION_CREDENTIALS internally for dbt
 
+      # 📦 Step 3: Install dbt packages from packages.yml (if any)
+      - name: Update dbt deps
+        run: dbt debug
+
       # 🚀 Step 5: Run dbt build against the BigQuery CI target
       - name: Run dbt build
         run: dbt build --target ci 
