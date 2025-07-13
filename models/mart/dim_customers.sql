@@ -55,4 +55,4 @@ joined as (
 
 )
 
-select * from joined 
+select * from joined
